@@ -284,6 +284,156 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kwens.win/2018/12/11/twitter-oauth/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kwens">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一个无聊的地方">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/11/twitter-oauth/" itemprop="url">twitter接入之oauth验证</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-11T09:29:17+00:00">
+                2018-12-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h3 id="详细步骤说明"><a href="#详细步骤说明" class="headerlink" title="详细步骤说明"></a>详细步骤说明</h3><ol>
+<li><p>获取consumer_key和consumer_key_secret。</p>
+<ul>
+<li>申请twitter开发者账号</li>
+<li>新建应用即可拿到</li>
+</ul>
+</li>
+<li><p>请求oauth/request_token<br>该请求作为验证第一步，主要验证权限和获取权限token。请求没有body参数，只需将验证所需的参数按顺序放入Authorization头即可。实例如下：</p>
+</li>
+</ol>
+<img src="/2018/12/11/twitter-oauth/twitter_oauth_1.png">
+<ul>
+<li>oauth_callback：回调地址，一般是应用的主页</li>
+<li>oauth_consumer_key：开发者账号获得</li>
+<li>oauth_nonce：随机32位字符串，必须进行urlencode。</li>
+<li>oauth_signature：签名(这个很重要，签名方法看最后)</li>
+<li>oauth_signature_method：签名的加密方式，固定为HMAC-SHA1必须为大写</li>
+<li>oauth_timestamp：请求时时间戳</li>
+<li>oauth_version：oauth版本，twitter使用的是1.0版本</li>
+</ul>
+<p>请求Response实例：</p>
+<img src="/2018/12/11/twitter-oauth/oauth_res_1.png">
+<p>注：</p>
+<ul>
+<li>oauth_nonce和oauth_timestamp每次请求时都必须重新生成且唯一。</li>
+<li>请求返回的oauth_callback_confirmed必须为true才代表验证通过</li>
+</ul>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/12/11/twitter-oauth/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://kwens.win/2018/12/11/build-blog-2/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -600,7 +750,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -613,7 +763,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

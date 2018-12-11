@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[twitter接入之oauth验证]]></title>
+    <url>%2F2018%2F12%2F11%2Ftwitter-oauth%2F</url>
+    <content type="text"><![CDATA[详细步骤说明 获取consumer_key和consumer_key_secret。 申请twitter开发者账号 新建应用即可拿到 请求oauth/request_token该请求作为验证第一步，主要验证权限和获取权限token。请求没有body参数，只需将验证所需的参数按顺序放入Authorization头即可。实例如下： oauth_callback：回调地址，一般是应用的主页 oauth_consumer_key：开发者账号获得 oauth_nonce：随机32位字符串，必须进行urlencode。 oauth_signature：签名(这个很重要，签名方法看最后) oauth_signature_method：签名的加密方式，固定为HMAC-SHA1必须为大写 oauth_timestamp：请求时时间戳 oauth_version：oauth版本，twitter使用的是1.0版本 请求Response实例： 注： oauth_nonce和oauth_timestamp每次请求时都必须重新生成且唯一。 请求返回的oauth_callback_confirmed必须为true才代表验证通过 重定向到用户授权页面。前端将上述获取的oauth_token作为参数重定向页面到：https://api.twitter.com/oauth/authenticate?oauth_token=&lt;上一步获取的值&gt; 用户进行授权用户授权成功后，会自动跳转回最初设定的回调地址，并带回两个参数，如下所示： 获取access_token将上述的两个参数加入验证头，并请求oauth/access_token获取最终的token和secret 请求Response实例： 使用最终获取的token和secret进行其他接口请求 签名方法 获取请求方式：POST或者GET 获取请求地址, 必须为urlencode之后的数值，如：https%3A%2F%2Fapi.twitter.com%2Foauth%2Faccess_token 生成加密字符串 获取除oauth_signature之外的所有参数字典，并进行按字母顺序排序。将该参数字典进行urlencode。urlencode之后再对该值进行一次url编码（python2的方式是urlib.quote，python3中是urlib.parse.quote） 拼接加密字符串，格式为&lt;请求方式&gt;&amp;&lt;请求地址&gt;&amp;&lt;请求参数&gt;，比如安装上方的例子就是：POST&amp; https%3A%2F%2Fapi.twitter.com%2Foauth%2Faccess_token&amp;&lt;生成的字符串数据&gt; 生成加密key，格式为：consumer_secret&amp;token_secret 第一次请求/request_token时，token_secret是空字符串，所以key就为: consumer_secret&amp;（注意&amp;还是要写进去） 之后请求获取到oauth_token_secret值就为：consumer_secret&amp;oauth_token_secret。Oauth_token_secret始终使用最后获取到的值。 使用sha1进行加密，注意最终还是要再进行两次encode，如下 将签名放入请求头的参数字典。]]></content>
+      <tags>
+        <tag>oauth</tag>
+        <tag>twitter</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[基于github pages + hexo的blog（二）博客源码同步]]></title>
     <url>%2F2018%2F12%2F11%2Fbuild-blog-2%2F</url>
     <content type="text"><![CDATA[一，上传到github 在你的github上建立博客源码目录，比如：yourname.github.io.source 将之前本地的hexo源码上传到该目录下 如果有使用第三方主题的 将之前安装的主题目录删除 将需要安装的主题fork到自己的github上，方便自己修改配置 使用 git submodule add 代替 git clone git submodule add https://github.com/kwens/hexo-theme-next themes/next 此时会自动生成一个.gitmodules文件 提交上述修改 二，修改主题配置 直接在 themes/yourthemes 目录下修改，并直接提交推送到你自己的仓库中 三，如何使用 已拉取过该项目的机子： git pull 拉取更新 git submodule update 拉取子模块更新 未拉取过该项目的机子： git clone 源码项目 git submodule update –init 初始化子模块 安装依赖包，开启本地调试，写文章等操作。 四，如何持续化集成发布文章市面上提供持续化集成的网站很多，此处选择使用AppVeyor 先注册一个AppVeyor账号，可以直接使用github账号 在github中生成一个token: 点击头像 -&gt; setting -&gt; Developer settings -&gt; Personal access tokens -&gt; Generate new token 选择条件生成即可。记住生成的token值。 在AppVeyor中 点击 settings -&gt; Encrypt YAML 将GitHub的token再加密一次，获得最终的token(该token用于最后的appveyor.yml文件)。 新建一个project，直接关联到github中博客源码项目 配置该project的环境变量(点击该project最右边的设置按钮，选择Enviroment)分别为： GIT_USER_EMAIL 你的github邮箱 GIT_USER_NAME 你的github账号名称 STATIC_SITE_REPO 你的github博客项目(不是源码项目)地址 TARGET_BRANCH 你的github博客项目(不是源码项目)主要分支 在博客源码添加appveyor.yml文件，文件内容如最后所示 将appveyor.yml提交至github即可。 1234567891011121314151617181920212223242526appveyor.yml脚本内容：clone_depth: 10environment: access_token: secure: 刚才的tokeninstall:- npm install- npm install -g hexo-cli- git submodule update --initbuild_script:- hexo generateartifacts:- path: publicon_success:- git config --global credential.helper store- ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"- git config --global user.email "%GIT_USER_EMAIL%"- git config --global user.name "%GIT_USER_NAME%"- git clone --depth 5 -q --branch=%TARGET_BRANCH% %STATIC_SITE_REPO% %TEMP%\static-site- cd %TEMP%\static-site- del * /f /q- for /d %%p IN (*) do rmdir "%%p" /s /q- SETLOCAL EnableDelayedExpansion &amp; robocopy "%APPVEYOR_BUILD_FOLDER%\public" "%TEMP%\static-site" /e &amp; IF !ERRORLEVEL! EQU 1 (exit 0) ELSE (IF !ERRORLEVEL! EQU 3 (exit 0) ELSE (exit 1))- git add -A- if "%APPVEYOR_REPO_BRANCH%"=="master" if not defined APPVEYOR_PULL_REQUEST_NUMBER (git diff --quiet --exit-code --cached || git commit -m "Update Static Site" &amp;&amp; git push origin %TARGET_BRANCH% &amp;&amp; appveyor AddMessage "Static Site Updated") 参考文章https://www.jianshu.com/p/5abacac4133chttps://formulahendry.github.io/2016/12/04/hexo-ci/https://blog.csdn.net/u011475210/article/details/79023429]]></content>
       <tags>
         <tag>blog</tag>
       </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[Hello World]]></title>
-    <url>%2F2018%2F12%2F11%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[Welcome to Hexo!!!! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
   </entry>
   <entry>
     <title><![CDATA[基于github pages + hexo的blog（一）搭建]]></title>
